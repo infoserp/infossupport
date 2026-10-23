@@ -1,0 +1,20 @@
+<?php
+// Copy to db.php and fill in real values. db.php is not tracked in git.
+
+const APP_COMPANY = 'Your Company Name';   // shown in the app header and on PDF reports
+
+$server   = "DESKTOP-KPBMUH3";
+$database = "YOUR_DATABASE";        // the ERP database: 
+$user     = "support_app";
+$password = "YOUR_PASSWORD";
+
+date_default_timezone_set('Asia/Dubai');
+
+try {
+    $conn = new PDO("sqlsrv:Server=$server;Database=$database;TrustServerCertificate=1", $user, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log("Connection failed: " . $e->getMessage());
+    die('Database connection error');
+}

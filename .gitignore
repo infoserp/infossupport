@@ -1,0 +1,13 @@
+# Local configuration & credentials -- copy inc/db.php.example to inc/db.php
+/inc/db.php
+
+# Runtime data
+*.log
+
+# Editor / OS
+/.vscode/
+Thumbs.db
+desktop.ini
+
+# Claude Code local (per-user) settings
+.claude/settings.local.json
