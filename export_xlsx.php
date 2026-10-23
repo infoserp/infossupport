@@ -9,9 +9,9 @@ require_login();
 if (($_GET['report'] ?? '') === 'customers') {
     $rows = [];
     foreach (customer_totals(build_customer_summary_filter($_GET), ...sort_from($_GET, CUSTOMER_SORTS, 'total')) as $r) {
-        $rows[] = [$r['ac_code'], $r['category_code'], $r['customer_name'], $r['total'], $r['online'], $r['onsite']];
+        $rows[] = [$r['ac_code'], $r['category'], $r['customer_name'], $r['total'], $r['online'], $r['onsite']];
     }
-    $bytes = xlsx_build('Customer Summary', ['Code', 'Category', 'Customer', 'Total calls', 'Online', 'Onsite'], $rows, [10, 12, 50, 12, 10, 10]);
+    $bytes = xlsx_build('Customer Summary', ['Code', 'Category', 'Customer', 'Total calls', 'Online', 'Onsite'], $rows, [10, 32, 50, 12, 10, 10]);
     $name = 'customer-summary-' . date('Ymd-His') . '.xlsx';
 } else {
     $flt = build_call_filter($_GET, false);

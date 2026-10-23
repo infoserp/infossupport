@@ -89,7 +89,7 @@ page_start('Customer Summary', 'reports-customers');
                 <tr>
                     <td class="strong"><a href="customer_view.php?code=<?= h($r['ac_code']) ?>"><?= h($r['customer_name']) ?></a></td>
                     <td class="mono"><?= h($r['ac_code']) ?></td>
-                    <td class="mono"><?= $r['category_code'] !== '' ? h($r['category_code']) : '<span class="muted">—</span>' ?></td>
+                    <td class="small"><?= $r['category'] !== '' ? h($r['category']) : '<span class="muted">—</span>' ?></td>
                     <td class="right mono strong"><?= number_format($r['total']) ?></td>
                     <td class="right mono"><?= number_format($r['online']) ?></td>
                     <td class="right mono<?= $r['onsite'] ? ' text-red' : '' ?>"><?= number_format($r['onsite']) ?></td>

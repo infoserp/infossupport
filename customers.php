@@ -99,7 +99,7 @@ page_start('Customers', $tabs[$tab]['nav']);
                         <?php if ($c['status'] === 'NoSupport' && $c['erp_blocked'] && (!$ns || $remark !== '')): ?><div class="small text-red"><?= $ns ? h($remark) : 'Blocked in ERP' . ($remark !== '' ? ' · ' . h($remark) : '') ?></div>
                         <?php elseif ($c['status'] === 'NoSupport' && !$c['erp_blocked'] && $c['ns_reason']): ?><div class="small text-red"><?= $ns ? '' : 'Since ' . h(fmt_date($c['ns_since'])) . ' · ' ?><?= h($c['ns_reason']) ?></div><?php endif; ?>
                     </td>
-                    <td class="mono small" title="<?= h((string) $c['category_name']) ?>"><?= h((string) $c['category_code']) ?: '<span class="muted">—</span>' ?></td>
+                    <td class="small"><?= h(trim((string) ($c['category_name'] ?: $c['category_code']))) ?: '<span class="muted">—</span>' ?></td>
                     <td><?= h($c['contact_name']) ?></td>
                     <td class="small nowrap"><?= h($c['contact_no'] ?: $c['tel_off']) ?></td>
                     <td><?= status_badge($c['status']) ?></td>

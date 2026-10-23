@@ -19,7 +19,7 @@ const CALL_SORTS = [
 const CUSTOMER_SORTS = [
     'customer' => 'MAX(sc.customer_name)',
     'code'     => 'sc.ac_code',
-    'category' => 'MAX(ca.category_code)',
+    'category' => 'MAX(COALESCE(cm.category_name, ca.category_code))',
     'total'    => 'COUNT(*)',
     'online'   => "SUM(CASE WHEN sc.type = 'Online' THEN 1 ELSE 0 END)",
     'onsite'   => "SUM(CASE WHEN sc.type = 'Onsite' THEN 1 ELSE 0 END)",
@@ -164,14 +164,15 @@ function customer_totals(array $flt, string $sort = 'total', string $dir = 'DESC
     global $conn;
     $st = $conn->prepare("SELECT sc.ac_code, MAX(sc.customer_name) AS customer_name, COUNT(*) AS total,
             SUM(CASE WHEN sc.type = 'Online' THEN 1 ELSE 0 END) AS online,
-            SUM(CASE WHEN sc.type = 'Onsite' THEN 1 ELSE 0 END) AS onsite, MAX(RTRIM(ca.category_code)) AS category_code
+            SUM(CASE WHEN sc.type = 'Onsite' THEN 1 ELSE 0 END) AS onsite, MAX(RTRIM(COALESCE(cm.category_name, ca.category_code))) AS category
         " . CALLS_FROM . "
         LEFT JOIN " . erp('ac_master') . " ca ON ca.company_code = sc.company_code AND ca.ac_code = sc.ac_code
+        LEFT JOIN " . erp('category_master') . " cm ON cm.category_code = ca.category_code
         {$flt['where']}
         GROUP BY sc.ac_code
         ORDER BY " . CUSTOMER_SORTS[$sort] . " $dir, " . ($sort === 'customer' ? 'sc.ac_code' : 'MAX(sc.customer_name)'));
     $st->execute($flt['params']);
-    return array_map(fn($r) => ['ac_code' => trim($r['ac_code']), 'customer_name' => $r['customer_name'], 'category_code' => (string) $r['category_code'],
+    return array_map(fn($r) => ['ac_code' => trim($r['ac_code']), 'customer_name' => $r['customer_name'], 'category' => (string) $r['category'],
         'total' => (int) $r['total'], 'online' => (int) $r['online'], 'onsite' => (int) $r['onsite']], $st->fetchAll());
 }
 

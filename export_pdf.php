@@ -23,9 +23,9 @@ if (($_GET['report'] ?? '') === 'customers') {
     $title = 'Customer Support Summary';
     $boxes = [['CUSTOMERS', count($rows), $ink], ['TOTAL CALLS', $sum['total'], $ink], ['ONLINE', $sum['online'], $ink], ['ONSITE', $sum['onsite'], $red]];
     $heads = ['Code', 'Category', 'Customer', 'Total calls', 'Online', 'Onsite'];
-    $colW = [60, 70, $W - 60 - 70 - 3 * 90, 90, 90, 90];
+    $colW = [60, 150, $W - 60 - 150 - 3 * 90, 90, 90, 90];
     $right = [3, 4, 5];                 // number columns
-    $cells = fn(array $r) => [[$r['ac_code']], [$r['category_code'] !== '' ? $r['category_code'] : '-'], $pdf->wrap($r['customer_name'], $colW[2] - 2 * $pad, $fs, true),
+    $cells = fn(array $r) => [[$r['ac_code']], $r['category'] !== '' ? $pdf->wrap($r['category'], $colW[1] - 2 * $pad, $fs, false) : ['-'], $pdf->wrap($r['customer_name'], $colW[2] - 2 * $pad, $fs, true),
         [number_format($r['total'])], [number_format($r['online'])], [number_format($r['onsite'])]];
     $style = fn(array $r, int $ci) => [$ci === 2 || $ci === 3, $ci === 5 && $r['onsite'] ? $red : $ink];
     $total = ['', '', 'Total', number_format($sum['total']), number_format($sum['online']), number_format($sum['onsite'])];
