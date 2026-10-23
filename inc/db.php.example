@@ -1,10 +1,21 @@
 <?php
-// Copy to db.php and fill in real values. db.php is not tracked in git.
+// Template only. Live deploy uses inc/db.php, which loads ../config.local.php.
+// Copy config.local.php.example → config.local.php and set GearHost credentials.
 
 const APP_COMPANY = 'Your Company Name';   // shown in the app header and on PDF reports
 
-$server   = "DESKTOP-KPBMUH3";
-$database = "YOUR_DATABASE";        // the ERP database: 
+// --- Option A: config.local.php in project root ---
+// return [
+//     'db' => [
+//         'server'   => 'den1.mssql8.gear.host',
+//         'database' => 'infos',
+//         'user'     => 'infos',
+//         'password' => 'YOUR_GEARHOST_PASSWORD',
+//     ],
+// ];
+
+$server   = "DESKTOP-KPBMUH3";          // local: DESKTOP-KPBMUH3 | GearHost: den1.mssqlN.gear.host
+$database = "YOUR_DATABASE";            // GearHost: same name as the DB (often also the username)
 $user     = "support_app";
 $password = "YOUR_PASSWORD";
 

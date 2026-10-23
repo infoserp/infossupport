@@ -1,5 +1,5 @@
-# Local configuration & credentials -- copy inc/db.php.example to inc/db.php
-/inc/db.php
+# Local/server secrets — create from config.local.php.example on each host
+/config.local.php
 
 # Runtime data
 *.log

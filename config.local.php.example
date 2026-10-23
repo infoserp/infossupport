@@ -1,0 +1,13 @@
+<?php
+/**
+ * Copy to config.local.php and fill in real values.
+ * config.local.php is gitignored — never commit passwords.
+ */
+return [
+    'db' => [
+        'server'   => 'den1.mssql8.gear.host',
+        'database' => 'infos',
+        'user'     => 'infos',
+        'password' => 'YOUR_GEARHOST_PASSWORD',
+    ],
+];
