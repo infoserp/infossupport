@@ -9,7 +9,9 @@ $b = current_branch();
 $people = [];   // keyed by lower-case code
 $add = function (string $code, string $name, ?string $role) use (&$people): void {
     $k = strtolower(trim($code));
-    $people[$k] ??= ['code' => trim($code), 'name' => trim($name) ?: trim($code), 'role' => $role, 'calls' => 0, 'last_call' => null];
+    if (!isset($people[$k])) {
+        $people[$k] = ['code' => trim($code), 'name' => trim($name) ?: trim($code), 'role' => $role, 'calls' => 0, 'last_call' => null];
+    }
 };
 
 $st = $conn->prepare('SELECT bu.user_id, bu.user_name, m.emp_code, e.emp_name FROM ' . erp('branch_user') . ' bu
@@ -35,7 +37,9 @@ foreach ($st as $r) {
     $people[$k]['calls'] = (int) $r['n'];
     $people[$k]['last_call'] = $r['last_call'];
 }
-uasort($people, fn($x, $y) => strcasecmp($x['name'], $y['name']));
+uasort($people, function ($x, $y) {
+    return strcasecmp($x['name'], $y['name']);
+});
 
 page_start('Supporters', 'supporters');
 ?>

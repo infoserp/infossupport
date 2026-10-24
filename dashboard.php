@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $st = $conn->prepare("SELECT doc_id, emp_code, status, last_userdate, last_userid FROM v_support_calls
         WHERE doc_id = ? AND company_code = ? AND branch_code = ? AND status IN ('P', 'O')");
-    $st->execute([$id, ...$scope]);
+    $st->execute(array_merge([$id], $scope));
     $c = $st->fetch();
     if ($c && can_edit_call($c)) {
         $done = $conn->prepare("UPDATE support_calls SET status = 'C', last_userdate = SYSDATETIME(), last_userid = ?
@@ -56,16 +56,18 @@ $k = $conn->prepare("SELECT COUNT(*) AS total,
         SUM(CASE WHEN status = 'P' THEN 1 ELSE 0 END) AS pending,
         SUM(CASE WHEN status = 'O' THEN 1 ELSE 0 END) AS ongoing
     FROM v_support_calls WHERE company_code = ? AND branch_code = ?");
-$k->execute([$monthStart, $monthEnd, ...$scope]);
+$k->execute(array_merge([$monthStart, $monthEnd], $scope));
 $kpi = array_map('intval', $k->fetch());
-$pct = fn(int $n) => $kpi['total'] ? round($n * 100 / $kpi['total']) : 0;
+$pct = function (int $n) use ($kpi) {
+    return $kpi['total'] ? round($n * 100 / $kpi['total']) : 0;
+};
 
 // Calls by month: last 12 months including the current one, zero-filled.
 $from = date('Y-m-01', strtotime('-11 months', strtotime($monthStart)));
 $st = $conn->prepare('SELECT YEAR(doc_date) AS y, MONTH(doc_date) AS m, COUNT(*) AS n
     FROM v_support_calls WHERE company_code = ? AND branch_code = ? AND doc_date >= ? AND doc_date <= ?
     GROUP BY YEAR(doc_date), MONTH(doc_date)');
-$st->execute([...$scope, $from, $monthEnd]);
+$st->execute(array_merge($scope, [$from, $monthEnd]));
 $byMonthRaw = [];
 foreach ($st as $r) {
     $byMonthRaw[sprintf('%04d-%02d', $r['y'], $r['m'])] = (int) $r['n'];

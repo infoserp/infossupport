@@ -39,7 +39,7 @@ $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 $inner = 'SELECT ' . CUSTOMER_COLUMNS . ' ' . customer_from();
 
 $cnt = $conn->prepare("SELECT COUNT(*) FROM ($inner) c $whereSql");
-$cnt->execute([$b['company_code'], ...$params]);
+$cnt->execute(array_merge([$b['company_code']], $params));
 $total = (int) $cnt->fetchColumn();
 $pages = max(1, (int) ceil($total / PER_PAGE));
 $page = min($pages, max(1, (int) ($_GET['page'] ?? 1)));
@@ -53,7 +53,7 @@ $st = $conn->prepare("SELECT c.*,
         (SELECT TOP 1 dbo.fn_user_name(n.company_code, n.user_id) FROM no_support_history n WHERE n.company_code = c.company_code AND n.ac_code = c.ac_code AND n.end_date IS NULL ORDER BY n.id DESC) AS ns_by
     FROM ($inner) c $whereSql ORDER BY c.name
     OFFSET " . (($page - 1) * PER_PAGE) . ' ROWS FETCH NEXT ' . PER_PAGE . ' ROWS ONLY');
-$st->execute([$b['branch_code'], $b['branch_code'], $b['company_code'], ...$params]);
+$st->execute(array_merge([$b['branch_code'], $b['branch_code'], $b['company_code']], $params));
 $rows = $st->fetchAll();
 
 page_start('Customers', $tabs[$tab]['nav']);

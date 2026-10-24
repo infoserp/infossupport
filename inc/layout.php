@@ -46,7 +46,7 @@ function page_start(string $title, string $active = ''): void
     $u = current_user();
     head_tags($title);
     $nav = function (string $key, string $href, string $ico, string $label, bool $sub = false) use ($active) {
-        $on = $active === $key || (!$sub && str_starts_with($active, $key . '-'));
+        $on = $active === $key || (!$sub && strpos($active, $key . '-') === 0);
         echo '<a class="nav-link' . ($sub ? ' nav-sub' : '') . ($on ? ' active' : '') . '" href="' . h($href) . '">'
             . ($ico ? icon($ico) : '') . '<span>' . h($label) . '</span></a>';
     };
@@ -149,7 +149,9 @@ function render_call_table(array $rows, bool $withComment = false, ?array $sorte
         echo '<div class="empty">' . icon('inbox') . '<p>No support calls recorded yet.</p><a class="btn btn-primary" href="call_add.php">' . icon('add') . 'Add the first support call</a></div>';
         return;
     }
-    $th = fn(string $key, string $label) => $sorted ? sort_th($key, $label, ...$sorted) : '<th>' . $label . '</th>';
+    $th = function (string $key, string $label) use ($sorted) {
+        return $sorted ? sort_th($key, $label, ...$sorted) : '<th>' . $label . '</th>';
+    };
     echo '<div class="table-scroll"><table class="table table-cards"><thead><tr>' . $th('date', 'Date') . $th('customer', 'Customer') . $th('supporter', 'Supporter')
         . $th('type', 'Type') . $th('status', 'Status') . '<th>Task</th>' . ($withComment ? '<th>Comment</th>' : '') . '<th class="right">Action</th></tr></thead><tbody>';
     foreach ($rows as $r) {

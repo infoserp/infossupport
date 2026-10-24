@@ -67,7 +67,7 @@ page_start('Customer Summary', 'reports-customers');
     <div class="table-head">
         <div>
             <h2 class="card-title">Customers</h2>
-            <span class="muted small"><?= h(implode(' · ', array_map(fn($k, $v) => "$k: $v", array_keys($flt['labels']), $flt['labels']))) ?></span>
+            <span class="muted small"><?= h(implode(' · ', array_map(function ($k, $v) { return "$k: $v"; }, array_keys($flt['labels']), $flt['labels']))) ?></span>
         </div>
     </div>
     <?php if (!$rows): ?>

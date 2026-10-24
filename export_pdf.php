@@ -25,9 +25,19 @@ if (($_GET['report'] ?? '') === 'customers') {
     $heads = ['Code', 'Category', 'Customer', 'Total calls', 'Online', 'Onsite'];
     $colW = [60, 150, $W - 60 - 150 - 3 * 90, 90, 90, 90];
     $right = [3, 4, 5];                 // number columns
-    $cells = fn(array $r) => [[$r['ac_code']], $r['category'] !== '' ? $pdf->wrap($r['category'], $colW[1] - 2 * $pad, $fs, false) : ['-'], $pdf->wrap($r['customer_name'], $colW[2] - 2 * $pad, $fs, true),
-        [number_format($r['total'])], [number_format($r['online'])], [number_format($r['onsite'])]];
-    $style = fn(array $r, int $ci) => [$ci === 2 || $ci === 3, $ci === 5 && $r['onsite'] ? $red : $ink];
+    $cells = function (array $r) use ($pdf, $colW, $pad, $fs) {
+        return [
+            [$r['ac_code']],
+            $r['category'] !== '' ? $pdf->wrap($r['category'], $colW[1] - 2 * $pad, $fs, false) : ['-'],
+            $pdf->wrap($r['customer_name'], $colW[2] - 2 * $pad, $fs, true),
+            [number_format($r['total'])],
+            [number_format($r['online'])],
+            [number_format($r['onsite'])],
+        ];
+    };
+    $style = function (array $r, int $ci) use ($red, $ink) {
+        return [$ci === 2 || $ci === 3, $ci === 5 && $r['onsite'] ? $red : $ink];
+    };
     $total = ['', '', 'Total', number_format($sum['total']), number_format($sum['online']), number_format($sum['onsite'])];
     $empty = 'No support calls in this period.';
     $name = 'customer-summary-' . date('Ymd-His') . '.pdf';
@@ -40,16 +50,20 @@ if (($_GET['report'] ?? '') === 'customers') {
     $heads = ['Date', 'Customer', 'Supporter', 'Type', 'Status', 'Task', 'Comment'];
     $colW = [64, 135, 90, 46, 60, $W - 64 - 135 - 90 - 46 - 60 - 150, 150];
     $right = [];
-    $cells = fn(array $r) => [
-        [fmt_date($r['doc_date'])],
-        $pdf->wrap($r['customer_name'], $colW[1] - 2 * $pad, $fs, true),
-        $pdf->wrap($r['supporter_name'], $colW[2] - 2 * $pad, $fs, false),
-        [$r['type']],
-        [CALL_STATUSES[$r['status']] ?? $r['status']],
-        $pdf->wrap($r['task_completed'], $colW[5] - 2 * $pad, $fs, false),
-        $pdf->wrap((string) $r['comment'], $colW[6] - 2 * $pad, $fs, false),
-    ];
-    $style = fn(array $r, int $ci) => [$ci === 1 || $ci === 3, $ci === 3 && $r['type'] === 'Onsite' ? $red : $ink];
+    $cells = function (array $r) use ($pdf, $colW, $pad, $fs) {
+        return [
+            [fmt_date($r['doc_date'])],
+            $pdf->wrap($r['customer_name'], $colW[1] - 2 * $pad, $fs, true),
+            $pdf->wrap($r['supporter_name'], $colW[2] - 2 * $pad, $fs, false),
+            [$r['type']],
+            [CALL_STATUSES[$r['status']] ?? $r['status']],
+            $pdf->wrap($r['task_completed'], $colW[5] - 2 * $pad, $fs, false),
+            $pdf->wrap((string) $r['comment'], $colW[6] - 2 * $pad, $fs, false),
+        ];
+    };
+    $style = function (array $r, int $ci) use ($red, $ink) {
+        return [$ci === 1 || $ci === 3, $ci === 3 && $r['type'] === 'Onsite' ? $red : $ink];
+    };
     $total = null;
     $empty = 'No support calls match the selected filters.';
     $name = 'support-call-report-' . date('Ymd-His') . '.pdf';
@@ -75,7 +89,9 @@ $pdf->line($L, 84, $R, 84, 1.2);
 
 // --- Applied filters block: every value in full (wrapped); the customer's cell is twice as wide
 $y = 96;
-$weights = array_map(fn($k) => $k === 'Customer' ? 2 : 1, array_keys($flt['labels']));
+$weights = array_map(function ($k) {
+    return $k === 'Customer' ? 2 : 1;
+}, array_keys($flt['labels']));
 $unit = $W / array_sum($weights);
 $x = $L;
 $hdr = [];
@@ -83,7 +99,9 @@ foreach (array_keys($flt['labels']) as $n => $k) {
     $hdr[] = [$x, $k, $pdf->wrap($flt['labels'][$k], $weights[$n] * $unit - 16, 9.5, false)];
     $x += $weights[$n] * $unit;
 }
-$blockH = 28 + 12 * max(array_map(fn($c) => count($c[2]), $hdr));
+$blockH = 28 + 12 * max(array_map(function ($c) {
+    return count($c[2]);
+}, $hdr));
 $pdf->rect($L, $y, $W, $blockH, [0.96, 0.95, 0.95]);
 foreach ($hdr as [$cx, $k, $lines]) {
     $pdf->text($cx + 10, $y + 14, strtoupper($k), 7, true, [0.45, 0.47, 0.47]);
@@ -141,7 +159,9 @@ foreach ($rows as $idx => $r) {
         $y = $drawHead(36);
     }
     if ($idx % 2 === 1) $pdf->rect($L, $y, $W, $rh, [0.98, 0.976, 0.973]);
-    $drawRow($cellLines, $y, fn(int $ci) => $style($r, $ci));
+    $drawRow($cellLines, $y, function (int $ci) use ($style, $r) {
+        return $style($r, $ci);
+    });
     $y += $rh;
     $pdf->line($L, $y, $R, $y, 0.4, [0.85, 0.85, 0.85]);
 }
@@ -152,7 +172,11 @@ if ($rows && $total) {
         $y = $drawHead(36);
     }
     $pdf->line($L, $y, $R, $y, 1, $ink);
-    $drawRow(array_map(fn($v) => [$v], $total), $y, fn(int $ci) => [true, $ci === count($total) - 1 ? $red : $ink]);
+    $drawRow(array_map(function ($v) {
+        return [$v];
+    }, $total), $y, function (int $ci) use ($total, $red, $ink) {
+        return [true, $ci === count($total) - 1 ? $red : $ink];
+    });
 }
 
 $bytes = $pdf->output();

@@ -10,7 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
         session_save_path($sessionDir);
     }
     ini_set('session.gc_maxlifetime', (string) $sessionLife);
-    session_set_cookie_params(['lifetime' => $sessionLife, 'httponly' => true, 'samesite' => 'Lax']);
+    session_set_cookie_params($sessionLife, '/', '', false, true);
     session_name('SUPPORTCALLS');
     session_start();
 }
@@ -24,7 +24,7 @@ function h($v): string
     return htmlspecialchars((string) $v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function redirect(string $url): never
+function redirect(string $url)
 {
     header('Location: ' . $url);
     exit;
@@ -61,7 +61,9 @@ function valid_date(?string $s): bool
 function qs(array $overrides = []): string
 {
     $q = array_merge($_GET, $overrides);
-    $q = array_filter($q, fn($v) => $v !== null && $v !== '');
+    $q = array_filter($q, function ($v) {
+        return $v !== null && $v !== '';
+    });
     return $q ? '?' . http_build_query($q) : '';
 }
 
@@ -371,14 +373,16 @@ function save_customer_flags(string $acCode, array $fields, string $by): void
 {
     global $conn;
     $cc = current_branch()['company_code'];
-    $sets = implode(', ', array_map(fn($k) => "$k = ?", array_keys($fields)));
+    $sets = implode(', ', array_map(function ($k) {
+        return "$k = ?";
+    }, array_keys($fields)));
     $st = $conn->prepare("UPDATE customer_flags SET $sets, last_userdate = SYSDATETIME(), last_userid = ? WHERE company_code = ? AND ac_code = ?");
-    $st->execute([...array_values($fields), $by, $cc, $acCode]);
+    $st->execute(array_merge(array_values($fields), [$by, $cc, $acCode]));
     if ($st->rowCount() === 0) {
         $cols = implode(', ', array_keys($fields));
         $ph = implode(', ', array_fill(0, count($fields), '?'));
         $conn->prepare("INSERT INTO customer_flags (company_code, ac_code, $cols, last_userid) VALUES (?, ?, $ph, ?)")
-             ->execute([$cc, $acCode, ...array_values($fields), $by]);
+             ->execute(array_merge([$cc, $acCode], array_values($fields), [$by]));
     }
 }
 

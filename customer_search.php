@@ -17,7 +17,6 @@ $st = $conn->prepare('SELECT TOP 30 ' . CUSTOMER_COLUMNS . ' ' . customer_from()
 $st->execute($params);
 
 header('Content-Type: application/json');
-echo json_encode(array_map(
-    fn($c) => ['v' => $c['ac_code'], 't' => customer_label($c), 's' => $c['status'], 'c' => customer_category($c)],
-    $st->fetchAll()
-));
+echo json_encode(array_map(function ($c) {
+    return ['v' => $c['ac_code'], 't' => customer_label($c), 's' => $c['status'], 'c' => customer_category($c)];
+}, $st->fetchAll()));

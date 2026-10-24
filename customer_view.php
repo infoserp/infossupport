@@ -13,7 +13,9 @@ if (!$c) {
 }
 
 // ---- notes: any logged-in user adds one; its author or an administrator can edit or delete it
-$canChangeNote = fn(array $n): bool => $me['role'] === 'admin' || strcasecmp(trim($n['user_id']), $me['code']) === 0;
+$canChangeNote = function (array $n) use ($me): bool {
+    return $me['role'] === 'admin' || strcasecmp(trim($n['user_id']), $me['code']) === 0;
+};
 $noteAction = $_SERVER['REQUEST_METHOD'] === 'POST' ? ($_POST['action'] ?? '') : '';
 if (in_array($noteAction, ['add_note', 'edit_note', 'delete_note'], true)) {
     csrf_check();

@@ -93,12 +93,15 @@ function build_call_filter(array $in, bool $withSearch = true): array
     }
 
     // Human-readable labels
-    $period = match (true) {
-        $f['from'] && $f['to'] => fmt_long($f['from']) . ' - ' . fmt_long($f['to']),
-        (bool) $f['from']      => 'From ' . fmt_long($f['from']),
-        (bool) $f['to']        => 'Up to ' . fmt_long($f['to']),
-        default                => 'All dates',
-    };
+    if ($f['from'] && $f['to']) {
+        $period = fmt_long($f['from']) . ' - ' . fmt_long($f['to']);
+    } elseif ($f['from']) {
+        $period = 'From ' . fmt_long($f['from']);
+    } elseif ($f['to']) {
+        $period = 'Up to ' . fmt_long($f['to']);
+    } else {
+        $period = 'All dates';
+    }
     // Names come from the calls themselves, so a label works even if the ERP record is gone.
     $name = function (string $col, string $key, string $val) use ($conn, $b): string {
         $st = $conn->prepare("SELECT TOP 1 $col FROM v_support_calls WHERE company_code = ? AND $key = ? ORDER BY doc_id DESC");
@@ -172,8 +175,16 @@ function customer_totals(array $flt, string $sort = 'total', string $dir = 'DESC
         GROUP BY sc.ac_code
         ORDER BY " . CUSTOMER_SORTS[$sort] . " $dir, " . ($sort === 'customer' ? 'sc.ac_code' : 'MAX(sc.customer_name)'));
     $st->execute($flt['params']);
-    return array_map(fn($r) => ['ac_code' => trim($r['ac_code']), 'customer_name' => $r['customer_name'], 'category' => (string) $r['category'],
-        'total' => (int) $r['total'], 'online' => (int) $r['online'], 'onsite' => (int) $r['onsite']], $st->fetchAll());
+    return array_map(function ($r) {
+        return [
+            'ac_code' => trim($r['ac_code']),
+            'customer_name' => $r['customer_name'],
+            'category' => (string) $r['category'],
+            'total' => (int) $r['total'],
+            'online' => (int) $r['online'],
+            'onsite' => (int) $r['onsite'],
+        ];
+    }, $st->fetchAll());
 }
 
 /** Every matching row, newest support date first unless sorted otherwise (used by reports + exports). */

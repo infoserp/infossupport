@@ -13,7 +13,9 @@ $sum = call_summary($flt);
 $pages = max(1, (int) ceil($sum['total'] / PER_PAGE));
 $page = min($pages, max(1, (int) ($_GET['page'] ?? 1)));
 $rows = call_rows($flt, PER_PAGE, ($page - 1) * PER_PAGE, $sort, $dir);
-$pct = fn(int $n) => $sum['total'] ? round($n * 100 / $sum['total'], 1) : 0;
+$pct = function (int $n) use ($sum) {
+    return $sum['total'] ? round($n * 100 / $sum['total'], 1) : 0;
+};
 
 $exportQs = http_build_query(array_filter([
     'from' => $f['from'], 'to' => $f['to'], 'customer' => $f['customer'] ?: '', 'supporter' => $f['supporter'] ?: '', 'type' => $f['type'], 'status' => $f['status'],
@@ -94,7 +96,7 @@ page_start('Call Report', 'reports-export');
     <div class="table-head">
         <div>
             <h2 class="card-title">Report results</h2>
-            <span class="muted small"><?= h(implode(' · ', array_map(fn($k, $v) => "$k: $v", array_keys($flt['labels']), $flt['labels']))) ?></span>
+            <span class="muted small"><?= h(implode(' · ', array_map(function ($k, $v) { return "$k: $v"; }, array_keys($flt['labels']), $flt['labels']))) ?></span>
         </div>
     </div>
     <?php if (!$rows): ?>

@@ -4,7 +4,13 @@
 
 final class XlsxDate
 {
-    public function __construct(public string $ymd) {}
+    /** @var string */
+    public $ymd;
+
+    public function __construct(string $ymd)
+    {
+        $this->ymd = $ymd;
+    }
 
     /** Excel serial day number (1900 date system). */
     public function serial(): int
