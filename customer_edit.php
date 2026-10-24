@@ -128,13 +128,17 @@ if ($posted) {
         if ($req && $v[$col] === '') $errors[] = $label . ' is required.';
         elseif (mb_strlen($v[$col]) > $max) $errors[] = $label . ' must be ' . $max . ' characters or fewer.';
     }
-    $fieldVals = array_map(fn($x) => $x === '' ? null : $x, array_intersect_key($v, CUST_FIELDS));
+    $fieldVals = array_map(function ($x) {
+        return $x === '' ? null : $x;
+    }, array_intersect_key($v, CUST_FIELDS));
 
     if (!$errors && $existing) {
         // Only descriptive fields change; the code, u_key and parent links never do.
-        $sets = implode(', ', array_map(fn($c) => "$c = ?", array_keys($fieldVals)));
+        $sets = implode(', ', array_map(function ($c) {
+            return "$c = ?";
+        }, array_keys($fieldVals)));
         $conn->prepare('UPDATE ' . erp('ac_master') . " SET description = ?, $sets, last_userid = ?, last_userdate = ? WHERE $isCustomer")
-             ->execute([$v['description'], ...array_values($fieldVals), $me['login'], date('Y-m-d H:i:s'), $cc, $code, $cc]);
+             ->execute(array_merge([$v['description']], array_values($fieldVals), [$me['login'], date('Y-m-d H:i:s'), $cc, $code, $cc]));
         flash('success', 'Customer ' . $code . ' updated.');
         redirect('customer_view.php?code=' . urlencode($code));
     }
@@ -155,8 +159,8 @@ if ($posted) {
                 $new = next_customer_code($cc);
                 if (strlen($new) > 5) { $errors[] = 'No customer codes left (ac_code is 5 characters).'; break; }
                 try {
-                    $ins->execute([$cc, $new, trim($parent['account_code']) . '-' . $new, trim($parent['account_code']), trim($parent['ac_code']),
-                        $v['description'], 'N', (int) $new, $me['login'], date('Y-m-d H:i:s'), ...array_values($fieldVals)]);
+                    $ins->execute(array_merge([$cc, $new, trim($parent['account_code']) . '-' . $new, trim($parent['account_code']), trim($parent['ac_code']),
+                        $v['description'], 'N', (int) $new, $me['login'], date('Y-m-d H:i:s')], array_values($fieldVals)));
                     flash('success', 'Customer ' . $new . ' (' . $v['description'] . ') created.');
                     redirect($return !== '' ? $return . (strpos($return, '?') === false ? '?' : '&') . 'customer=' . urlencode($new)
                                             : 'customer_view.php?code=' . urlencode($new));

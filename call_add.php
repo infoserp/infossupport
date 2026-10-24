@@ -69,7 +69,9 @@ $v = [
     'time_from'      => substr(trim((string) ($in ? ($in['time_from'] ?? '') : ($call['time_from'] ?? ''))), 0, 5),   // HH:MM
     'time_to'        => substr(trim((string) ($in ? ($in['time_to'] ?? '') : ($call['time_to'] ?? ''))), 0, 5),
 ];
-$orNull = fn(string $s) => $s === '' ? null : $s;
+$orNull = function (string $s) {
+    return $s === '' ? null : $s;
+};
 
 if ($posted) {
     csrf_check();
