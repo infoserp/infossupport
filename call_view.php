@@ -5,7 +5,7 @@ require __DIR__ . '/inc/calls_filter.php';
 require_login();
 $b = current_branch();
 
-$st = $conn->prepare('SELECT ' . CALLS_COLUMNS . ', sc.last_username, sc.job_no, sc.time_from, sc.time_to ' . CALLS_FROM . '
+$st = $conn->prepare('SELECT ' . CALLS_COLUMNS . ', sc.last_username ' . CALLS_FROM . '
     WHERE sc.doc_id = ? AND sc.company_code = ? AND sc.branch_code = ?');
 $st->execute([(int) ($_GET['id'] ?? 0), $b['company_code'], $b['branch_code']]);
 $r = $st->fetch();

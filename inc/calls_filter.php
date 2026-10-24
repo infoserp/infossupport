@@ -39,7 +39,7 @@ function call_order(string $sort, string $dir): string
 }
 
 const CALLS_COLUMNS = 'sc.doc_id, sc.doc_date, sc.type, sc.task_completed, sc.status, sc.comment, sc.user_date, sc.last_userdate,
-    sc.ac_code, sc.customer_name, sc.emp_code, sc.supporter_name';
+    sc.ac_code, sc.customer_name, sc.emp_code, sc.supporter_name, sc.job_no, sc.time_from, sc.time_to';
 
 /**
  * @return array{where: string, params: array, f: array, labels: array}

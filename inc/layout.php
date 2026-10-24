@@ -143,6 +143,13 @@ function sort_th(string $key, string $label, string $sort, string $dir, string $
 }
 
 /** Shared table markup (dashboard, reports). Pass [$sort, $dir] to make the headings sort the table. */
+/** "09:30–11:00" for a call with a time, '' without. */
+function call_time(array $r): string
+{
+    return $r['time_from'] ? substr($r['time_from'], 0, 5) . '–' . substr($r['time_to'], 0, 5) : '';
+}
+
+/** $withComment: the report view, which also shows the time under the date, the job number under the customer and the comment under the task. */
 function render_call_table(array $rows, bool $withComment = false, ?array $sorted = null): void
 {
     if (!$rows) {
@@ -153,16 +160,18 @@ function render_call_table(array $rows, bool $withComment = false, ?array $sorte
         return $sorted ? sort_th($key, $label, ...$sorted) : '<th>' . $label . '</th>';
     };
     echo '<div class="table-scroll"><table class="table table-cards"><thead><tr>' . $th('date', 'Date') . $th('customer', 'Customer') . $th('supporter', 'Supporter')
-        . $th('type', 'Type') . $th('status', 'Status') . '<th>Task</th>' . ($withComment ? '<th>Comment</th>' : '') . '<th class="right">Action</th></tr></thead><tbody>';
+        . $th('type', 'Type') . $th('status', 'Status') . '<th>Task</th>' . '<th class="right">Action</th></tr></thead><tbody>';
     foreach ($rows as $r) {
         echo '<tr>'
-            . '<td class="mono nowrap c-date">' . h(fmt_date($r['doc_date'])) . '</td>'
-            . '<td class="strong c-cust"><a href="customer_view.php?code=' . h($r['ac_code']) . '">' . h($r['customer_name']) . '</a></td>'
+            . '<td class="mono nowrap c-date">' . h(fmt_date($r['doc_date']))
+                . ($withComment && call_time($r) !== '' ? '<span class="cell-sub">' . h(call_time($r)) . '</span>' : '') . '</td>'
+            . '<td class="strong c-cust"><a href="customer_view.php?code=' . h($r['ac_code']) . '">' . h($r['customer_name']) . '</a>'
+                . ($withComment && (string) $r['job_no'] !== '' ? '<span class="cell-sub mono">Job ' . h($r['job_no']) . '</span>' : '') . '</td>'
             . '<td class="nowrap c-sup"><span class="mini-avatar">' . h(initial($r['supporter_name'])) . '</span>' . h($r['supporter_name']) . '</td>'
             . '<td class="c-type">' . type_badge($r['type']) . '</td>'
             . '<td class="c-status">' . call_status_badge($r['status']) . '</td>'
-            . '<td class="task c-task">' . h($r['task_completed']) . '</td>'
-            . ($withComment ? '<td class="task c-comment">' . ((string) $r['comment'] !== '' ? h($r['comment']) : '<span class="muted">—</span>') . '</td>' : '')
+            . '<td class="task c-task">' . h($r['task_completed'])
+                . ($withComment && (string) $r['comment'] !== '' ? '<span class="cell-sub">' . h($r['comment']) . '</span>' : '') . '</td>'
             . '<td class="right nowrap c-actions"><a class="btn btn-sm" href="call_view.php?id=' . (int) $r['doc_id'] . '">View</a>'
             . (can_edit_call($r) ? ' <a class="btn btn-sm" href="call_add.php?id=' . (int) $r['doc_id'] . '">Edit</a>' : '')
             . '</td>'

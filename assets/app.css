@@ -292,6 +292,7 @@ p { margin: 0; }
 .table td a:hover { text-decoration: underline; }
 .table td.task { min-width: 140px; max-width: 520px; }
 .table td.c-created { white-space: normal; min-width: 112px; }   /* date over time when space is short */
+.cell-sub { display: block; margin-top: 2px; font-size: 0.75rem; font-weight: 400; color: var(--on-surface-variant); }   /* second line in a cell, e.g. the time under the date */
 .row-stop { background: var(--row-stop); }
 .row-muted td { color: var(--outline); }
 .sort { display: inline-flex; align-items: center; gap: 2px; text-decoration: none !important; }
@@ -488,10 +489,10 @@ button.link:hover { text-decoration: underline; }
     .table-cards tbody tr:last-child { border-bottom: 0; }
     .table-cards td { display: block; padding: 0 !important; border: 0; min-width: 0; max-width: none; text-align: left; }
     .table-cards .c-date { order: 1; }
+    .table-cards .c-date .cell-sub { display: inline; margin-left: 8px; }
     .table-cards .c-status { order: 2; justify-self: end; }
     .table-cards .c-cust { order: 3; grid-column: 1 / -1; font-size: 0.9375rem; }
-    .table-cards .c-task, .table-cards .c-comment { order: 4; grid-column: 1 / -1; min-width: 0 !important; }
-    .table-cards .c-comment:has(.muted) { display: none; }
+    .table-cards .c-task { order: 4; grid-column: 1 / -1; min-width: 0 !important; }
     .table-cards .c-sup { order: 5; }
     .table-cards .c-type { order: 6; justify-self: end; }
     .table-cards .c-created { display: none; }
@@ -513,6 +514,7 @@ button.link:hover { text-decoration: underline; }
 @media (min-width: 901px) and (max-width: 1499px) {
     .table .c-sup .mini-avatar { display: none; }
     .table td.c-sup { white-space: normal; }
+    .table th, .table td { padding-left: 10px; padding-right: 10px; }
 }
 @media (min-width: 901px) and (max-width: 1399px) {
     .table .c-created { display: none; }   /* still on each call's page */

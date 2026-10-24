@@ -17,13 +17,13 @@ if (($_GET['report'] ?? '') === 'customers') {
     $flt = build_call_filter($_GET, false);
     $rows = [];
     foreach (call_rows($flt, null, 0, ...sort_from($_GET, CALL_SORTS, 'date')) as $r) {
-        $rows[] = [new XlsxDate($r['doc_date']), $r['customer_name'], $r['supporter_name'], $r['type'], CALL_STATUSES[$r['status']] ?? $r['status'], $r['task_completed'], (string) $r['comment']];
+        $rows[] = [new XlsxDate($r['doc_date']), (string) $r['job_no'], $r['time_from'] ? substr($r['time_from'], 0, 5) : '', $r['time_to'] ? substr($r['time_to'], 0, 5) : '', $r['customer_name'], $r['supporter_name'], $r['type'], CALL_STATUSES[$r['status']] ?? $r['status'], $r['task_completed'], (string) $r['comment']];
     }
     $bytes = xlsx_build(
         'Support Calls',
-        ['Date', 'Customer', 'Supporter', 'Type', 'Status', 'Task', 'Comment'],
+        ['Date', 'Job No', 'From', 'To', 'Customer', 'Supporter', 'Type', 'Status', 'Task', 'Comment'],
         $rows,
-        [14, 32, 22, 10, 12, 60, 50]
+        [14, 12, 8, 8, 32, 22, 10, 12, 60, 50]
     );
     $name = 'support-calls-' . date('Ymd-His') . '.xlsx';
 }

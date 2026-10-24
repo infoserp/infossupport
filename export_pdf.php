@@ -47,22 +47,23 @@ if (($_GET['report'] ?? '') === 'customers') {
     $rows = call_rows($flt, null, 0, ...sort_from($_GET, CALL_SORTS, 'date'));
     $title = 'Support Call Report';
     $boxes = [['TOTAL CALLS', $sum['total'], $ink], ['ONLINE', $sum['online'], $ink], ['ONSITE', $sum['onsite'], $red]];
-    $heads = ['Date', 'Customer', 'Supporter', 'Type', 'Status', 'Task', 'Comment'];
-    $colW = [64, 135, 90, 46, 60, $W - 64 - 135 - 90 - 46 - 60 - 150, 150];
+    $heads = ['Date / Time', 'Job No', 'Customer', 'Supporter', 'Type', 'Status', 'Task', 'Comment'];
+    $colW = [64, 74, 120, 80, 46, 56, $W - 64 - 74 - 120 - 80 - 46 - 56 - 130, 130];
     $right = [];
     $cells = function (array $r) use ($pdf, $colW, $pad, $fs) {
         return [
-            [fmt_date($r['doc_date'])],
-            $pdf->wrap($r['customer_name'], $colW[1] - 2 * $pad, $fs, true),
-            $pdf->wrap($r['supporter_name'], $colW[2] - 2 * $pad, $fs, false),
+            $r['time_from'] ? [fmt_date($r['doc_date']), substr($r['time_from'], 0, 5) . '-' . substr($r['time_to'], 0, 5)] : [fmt_date($r['doc_date'])],
+            $pdf->wrap((string) $r['job_no'], $colW[1] - 2 * $pad, $fs, false),
+            $pdf->wrap($r['customer_name'], $colW[2] - 2 * $pad, $fs, true),
+            $pdf->wrap($r['supporter_name'], $colW[3] - 2 * $pad, $fs, false),
             [$r['type']],
             [CALL_STATUSES[$r['status']] ?? $r['status']],
-            $pdf->wrap($r['task_completed'], $colW[5] - 2 * $pad, $fs, false),
-            $pdf->wrap((string) $r['comment'], $colW[6] - 2 * $pad, $fs, false),
+            $pdf->wrap($r['task_completed'], $colW[6] - 2 * $pad, $fs, false),
+            $pdf->wrap((string) $r['comment'], $colW[7] - 2 * $pad, $fs, false),
         ];
     };
     $style = function (array $r, int $ci) use ($red, $ink) {
-        return [$ci === 1 || $ci === 3, $ci === 3 && $r['type'] === 'Onsite' ? $red : $ink];
+        return [$ci === 2 || $ci === 4, $ci === 4 && $r['type'] === 'Onsite' ? $red : $ink];
     };
     $total = null;
     $empty = 'No support calls match the selected filters.';
