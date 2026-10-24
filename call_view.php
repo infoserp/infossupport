@@ -5,7 +5,7 @@ require __DIR__ . '/inc/calls_filter.php';
 require_login();
 $b = current_branch();
 
-$st = $conn->prepare('SELECT ' . CALLS_COLUMNS . ', sc.last_username ' . CALLS_FROM . '
+$st = $conn->prepare('SELECT ' . CALLS_COLUMNS . ', sc.last_username, sc.job_no, sc.time_from, sc.time_to ' . CALLS_FROM . '
     WHERE sc.doc_id = ? AND sc.company_code = ? AND sc.branch_code = ?');
 $st->execute([(int) ($_GET['id'] ?? 0), $b['company_code'], $b['branch_code']]);
 $r = $st->fetch();
@@ -41,6 +41,12 @@ page_start('Support Call #' . $r['doc_id'], 'calls-all');
         <dt>Customer</dt><dd><a href="customer_view.php?code=<?= h($r['ac_code']) ?>"><?= h($r['customer_name']) ?></a> <?= $cust && $cust['status'] !== 'Active' ? status_badge($cust['status']) : '' ?></dd>
         <dt>Supporter</dt><dd><a href="supporter_view.php?code=<?= h(urlencode($r['emp_code'])) ?>"><?= h($r['supporter_name']) ?></a></dd>
         <dt>Type</dt><dd><?= type_badge($r['type']) ?></dd>
+        <?php if ($r['job_no'] !== null && $r['job_no'] !== ''): ?><dt>Job No</dt><dd class="mono"><?= h($r['job_no']) ?></dd><?php endif; ?>
+        <?php if ($r['time_from']):
+            $mins = intdiv(strtotime($r['time_to']) - strtotime($r['time_from']), 60); ?>
+        <dt>Time</dt><dd class="mono"><?= h(substr($r['time_from'], 0, 5)) ?> – <?= h(substr($r['time_to'], 0, 5)) ?>
+            <span class="chip"><?= ($mins >= 60 ? intdiv($mins, 60) . ' h ' : '') . ($mins % 60 ? $mins % 60 . ' m' : '') ?></span></dd>
+        <?php endif; ?>
         <dt>Status</dt><dd><?= call_status_badge($r['status']) ?></dd>
         <dt>Task</dt><dd class="pre"><?= h($r['task_completed']) ?></dd>
         <?php if ($r['comment'] !== null && $r['comment'] !== ''): ?><dt>Comment</dt><dd class="pre"><?= h($r['comment']) ?></dd><?php endif; ?>

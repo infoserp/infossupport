@@ -147,6 +147,7 @@
     document.querySelectorAll('form').forEach(function (form) {
         form.noValidate = true;   // turn off the browser's bubbles; we show our own
         form.addEventListener('submit', function (e) {
+            if (e.submitter && e.submitter.formNoValidate) return;   // e.g. "New customer": leaves the form unfinished on purpose
             if (!validateForm(form)) { e.preventDefault(); e.stopImmediatePropagation(); }
         });
         var fix = function (e) {
