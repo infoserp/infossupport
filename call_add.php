@@ -152,7 +152,7 @@ $cancel = $call ? 'call_view.php?id=' . $id : calls_list_url();
 page_start($call ? 'Edit Support Call #' . $id : 'Add Support Call', 'calls-all');
 ?>
 <div class="form-page">
-    <div class="card form-card">
+    <div class="card form-card form-card-wide">
         <div class="form-card-head">
             <h1 class="h-modal"><?= $call ? icon('edit_note') . 'Edit Support Call #' . $id : icon('add_task') . 'Add Support Call' ?></h1>
             <a class="icon-btn" href="<?= h($cancel) ?>" title="Close"><?= icon('close') ?></a>
@@ -167,10 +167,16 @@ page_start($call ? 'Edit Support Call #' . $id : 'Add Support Call', 'calls-all'
 
         <form method="post" class="form-stack" id="call-form" novalidate>
             <?= csrf_field() ?>
-            <label class="field">
-                <span>Support Date <b class="req">*</b></span>
-                <input type="date" name="doc_date" required max="<?= date('Y-m-d') ?>" value="<?= h($v['doc_date']) ?>">
-            </label>
+            <div class="grid-2">
+                <label class="field">
+                    <span>Support Date <b class="req">*</b></span>
+                    <input type="date" name="doc_date" required max="<?= date('Y-m-d') ?>" value="<?= h($v['doc_date']) ?>">
+                </label>
+                <label class="field">
+                    <span>Job No</span>
+                    <input name="job_no" maxlength="20" autocomplete="off" placeholder="e.g. JC-1024" value="<?= h($v['job_no']) ?>">
+                </label>
+            </div>
 
             <div class="field-row">
                 <label class="field-label" for="customer-select">Customer <b class="req">*</b></label>
@@ -184,16 +190,8 @@ page_start($call ? 'Edit Support Call #' . $id : 'Add Support Call', 'calls-all'
                         <option value="<?= h($selected['ac_code']) ?>" data-status="<?= h($selected['status']) ?>" data-category="<?= h(customer_category($selected)) ?>"<?= $isOriginal ? ' data-original="1"' : '' ?> selected><?= h(customer_label($selected)) ?></option>
                     <?php endif; ?>
                 </select>
-            </label>
-
-            <label class="field">
-                <span>Category</span>
-                <input id="customer-category" readonly tabindex="-1" placeholder="No category" value="<?= h($selected ? customer_category($selected) : '') ?>">
-            </label>
-
-            <label class="field">
-                <span>Job No</span>
-                <input name="job_no" maxlength="20" autocomplete="off" value="<?= h($v['job_no']) ?>">
+                <?php $category = $selected ? customer_category($selected) : ''; ?>
+                <small class="field-note<?= $category === '' ? ' hidden' : '' ?>" id="customer-category-note">Category: <span id="customer-category"><?= h($category) ?></span></small>
             </label>
 
             <fieldset class="field">
@@ -204,19 +202,15 @@ page_start($call ? 'Edit Support Call #' . $id : 'Add Support Call', 'calls-all'
                 </div>
             </fieldset>
 
-            <fieldset class="field">
-                <legend>Time <span class="muted small">(optional)</span></legend>
+            <div class="grid-2">
+            <fieldset class="field time-range" data-time-range>
+                <legend class="field-row">Time
+                    <span class="legend-side"><span class="time-note" data-time-note aria-live="polite"></span><button type="button" class="link small" data-clear-fields>Clear</button></span></legend>
                 <div class="grid-2 tight">
-                    <label class="field"><span>From</span><input type="time" name="time_from" value="<?= h($v['time_from']) ?>"></label>
-                    <label class="field"><span>To</span><input type="time" name="time_to" value="<?= h($v['time_to']) ?>"></label>
+                    <label class="input-prefix"><span>From</span><input type="time" name="time_from" step="300" data-wheel value="<?= h($v['time_from']) ?>"></label>
+                    <label class="input-prefix"><span>To</span><input type="time" name="time_to" step="300" data-wheel value="<?= h($v['time_to']) ?>"></label>
                 </div>
             </fieldset>
-
-            <label class="field">
-                <span>Task <b class="req">*</b></span>
-                <textarea name="task_completed" rows="4" maxlength="2000" required placeholder="e.g. Configured Outlook on customer's computers"><?= h($v['task_completed']) ?></textarea>
-            </label>
-
             <fieldset class="field">
                 <legend>Status <b class="req">*</b></legend>
                 <div class="segmented">
@@ -225,6 +219,12 @@ page_start($call ? 'Edit Support Call #' . $id : 'Add Support Call', 'calls-all'
                     <?php endforeach; ?>
                 </div>
             </fieldset>
+            </div>
+
+            <label class="field">
+                <span>Task <b class="req">*</b></span>
+                <textarea name="task_completed" rows="3" maxlength="2000" required placeholder="e.g. Configured Outlook on customer's computers"><?= h($v['task_completed']) ?></textarea>
+            </label>
 
             <label class="field">
                 <span>Comment</span>

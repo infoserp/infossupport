@@ -54,6 +54,7 @@ function page_start(string $title, string $active = ''): void
 <body>
 <header class="topbar">
     <div class="topbar-left">
+        <button type="button" class="icon-btn nav-toggle" aria-controls="sidebar" aria-expanded="false" title="Menu"><?= icon('menu') ?></button>
         <a class="brand" href="dashboard.php"><?= icon('support_agent') ?><span>Infos Support</span></a>
         <form class="top-search" action="calls.php" method="get" role="search">
             <?= icon('search') ?>
@@ -75,7 +76,7 @@ function page_start(string $title, string $active = ''): void
     </div>
 </header>
 <div class="shell">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <nav>
             <?php
             $nav('dashboard', 'dashboard.php', 'dashboard', 'Dashboard');
