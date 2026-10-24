@@ -63,6 +63,7 @@ page_start('Customers', $tabs[$tab]['nav']);
         <h1>Customers</h1>
         <p class="muted">Support eligibility and support history.</p>
     </div>
+    <div class="actions"><a class="btn btn-primary" href="customer_edit.php"><?= icon('person_add') ?>Add customer</a></div>
 </div>
 
 <div class="tabbar">

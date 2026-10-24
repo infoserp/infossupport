@@ -330,6 +330,10 @@ p { margin: 0; }
 .field { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; border: 0; min-width: 0; }
 .field > span, .field legend { font: 500 0.9375rem/1.25rem var(--font-head); color: var(--on-surface); padding: 0; }
 .field-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.field-label { font: 500 0.9375rem/1.25rem var(--font-head); color: var(--on-surface); }
+.field-row + .field-tight { margin-top: -10px; }   /* a label row with an action, then its control */
+button.link { border: 0; background: none; padding: 0; cursor: pointer; color: var(--on-surface); }
+button.link:hover { text-decoration: underline; }
 .field input, .field select, .field textarea { width: 100%; padding: 8px 10px; min-height: 38px; border: 1px solid var(--outline-variant); border-radius: var(--radius); background: var(--surface-lowest); color: var(--on-surface); font: 0.9375rem/1.25rem var(--font-body); }
 .field input[type=date] { font-family: var(--font-mono); font-size: 0.84375rem; }
 .field textarea { resize: vertical; }
@@ -367,6 +371,20 @@ p { margin: 0; }
 .form-card-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 18px 28px; border-bottom: 1px solid var(--outline-variant); margin-bottom: 22px; }
 .h-modal { display: flex; align-items: center; gap: 10px; font: 600 1.25rem/1.75rem var(--font-body); letter-spacing: -0.01em; }
 .form-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin: 6px -28px 0; padding: 16px 28px 20px; border-top: 1px solid var(--outline-variant); background: var(--surface-low); }
+/* ---------- record form in sections (customer master): label column on the left, fields on the right */
+.fs-card { padding: 0; }
+.fs-row { padding: 16px 20px 20px; border-top: 1px solid var(--outline-variant); }
+.fs-row:first-of-type { border-top: 0; }
+.fs-title { font: 600 0.9375rem/1.25rem var(--font-head); margin-bottom: 12px; }
+.fs-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 16px; }
+.fs-fields .span-2 { grid-column: span 2; }
+.fs-fields .span-all { grid-column: 1 / -1; }
+.fs-fields.fs-cust { grid-template-columns: 110px minmax(0, 2fr) minmax(0, 1fr); }   /* short code, name, TRN */
+.fs-danger .fs-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.fs-label h2 { font: 600 0.9375rem/1.25rem var(--font-head); color: var(--secondary); }
+.fs-label p { color: var(--on-surface-variant); font-size: 0.84375rem; line-height: 1.25rem; }
+.fs-foot { position: sticky; bottom: 0; z-index: 3; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 20px; border-top: 1px solid var(--outline-variant); background: var(--surface-low); border-radius: 0 0 var(--radius) var(--radius); }
+.fs-danger { margin-top: 16px; }
 .form-narrow { max-width: 680px; }
 
 .dl { display: grid; grid-template-columns: 130px 1fr; gap: 10px 16px; margin: 0; font-size: 0.9375rem; }
@@ -456,6 +474,11 @@ p { margin: 0; }
     .chart-month, .span-2 { grid-column: auto; }
     .topbar-right .btn span:not(.mi) { display: none; }
     .radio-cards { grid-template-columns: 1fr; }
+    .fs-row { padding: 14px 16px 16px; }
+    .fs-fields { grid-template-columns: 1fr 1fr; }
+    .fs-fields.fs-cust { grid-template-columns: 110px minmax(0, 1fr); }   /* code beside name */
+    .fs-cust > :nth-child(n+3), .fs-fields .span-2 { grid-column: 1 / -1; }   /* TRN, address, project: full width */
+    .fs-foot { padding: 12px 16px; }
     /* iOS zooms into inputs smaller than 16px */
     .field input, .field select, .field textarea, .combo-input, .inline-search input { font-size: 1rem; }
     /* Call tables: each row becomes a card (date + status, customer, task, supporter + type, actions) */

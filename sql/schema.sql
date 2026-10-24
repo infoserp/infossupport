@@ -33,6 +33,9 @@ CREATE TABLE dbo.support_calls (
     status          CHAR(1)        NOT NULL CONSTRAINT df_calls_status DEFAULT 'C'   -- P Pending, O Ongoing, C Completed
                     CONSTRAINT ck_calls_status CHECK (status IN ('P', 'O', 'C')),
     comment         NVARCHAR(2000) NULL,
+    job_no          VARCHAR(20)    NULL,    -- job number as typed (ERP job_master.job_no)
+    time_from       TIME(0)        NULL,    -- optional time the support started / ended
+    time_to         TIME(0)        NULL,
     user_date       DATETIME2(0)   NOT NULL CONSTRAINT df_calls_created DEFAULT SYSDATETIME(),
     last_userdate   DATETIME2(0)   NULL,    -- last edit (by the supporter who entered it, or an admin)
     last_userid     VARCHAR(15)    NULL
@@ -79,6 +82,9 @@ CREATE TABLE dbo.support_calls_deleted (
     user_date        DATETIME2(0)   NOT NULL,
     last_userdate    DATETIME2(0)   NULL,
     last_userid      VARCHAR(15)    NULL,
+    job_no           VARCHAR(20)    NULL,
+    time_from        TIME(0)        NULL,
+    time_to          TIME(0)        NULL,
     deleted_userid   VARCHAR(15)    NOT NULL,
     deleted_userdate DATETIME2(0)   NOT NULL
 );
@@ -104,6 +110,10 @@ IF COL_LENGTH('dbo.support_calls', 'status') IS NULL
         CONSTRAINT ck_calls_status CHECK (status IN ('P', 'O', 'C'));
 IF COL_LENGTH('dbo.support_calls', 'comment') IS NULL
     ALTER TABLE dbo.support_calls ADD comment NVARCHAR(2000) NULL;
+IF COL_LENGTH('dbo.support_calls', 'job_no') IS NULL
+    ALTER TABLE dbo.support_calls ADD job_no VARCHAR(20) NULL, time_from TIME(0) NULL, time_to TIME(0) NULL;
+IF COL_LENGTH('dbo.support_calls_deleted', 'job_no') IS NULL
+    ALTER TABLE dbo.support_calls_deleted ADD job_no VARCHAR(20) NULL, time_from TIME(0) NULL, time_to TIME(0) NULL;
 GO
 
 -- Renamed columns and single-letter status, for databases created before the change.
@@ -202,7 +212,7 @@ SELECT sc.doc_id, sc.company_code, sc.branch_code, sc.doc_date, sc.ac_code,
        sc.emp_code,
        COALESCE(RTRIM(e.emp_name), sc.supporter_name) AS supporter_name,
        sc.type, sc.task_completed, sc.status, sc.comment,
-       sc.user_date, sc.last_userdate, sc.last_userid,
+       sc.user_date, sc.last_userdate, sc.last_userid, sc.job_no, sc.time_from, sc.time_to,
        dbo.fn_user_name(sc.company_code, sc.last_userid) AS last_username
 FROM dbo.support_calls sc
 LEFT JOIN dbo.ac_master a ON a.company_code = sc.company_code AND a.ac_code = sc.ac_code

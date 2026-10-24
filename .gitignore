@@ -11,3 +11,4 @@ desktop.ini
 
 # Claude Code local (per-user) settings
 .claude/settings.local.json
+/inc/config.local.php

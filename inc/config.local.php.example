@@ -1,0 +1,13 @@
+<?php
+// Copy this file to config.local.php (same folder) on each server and fill it in.
+// config.local.php is not tracked in git; web.config keeps the inc folder off the web.
+// Instead of this file, the same values can come from environment variables:
+// DB_SERVER, DB_DATABASE, DB_USER, DB_PASSWORD (and optionally APP_COMPANY).
+
+return [
+    'server'   => 'YOUR_SQL_SERVER',     // the SQL Server host, e.g. DESKTOP-KPBMUH3 or your host's server name
+    'database' => 'YOUR_ERP_DATABASE',   // the ERP database: it holds ac_master and the support call tables
+    'user'     => 'YOUR_SQL_LOGIN',
+    'password' => 'YOUR_SQL_PASSWORD',
+    'company'  => 'Infos Support',       // shown in the app header and on PDF reports
+];

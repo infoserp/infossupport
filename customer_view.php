@@ -120,6 +120,12 @@ page_start($c['name'], $navKey);
         <p class="muted small mono">Code <?= h($c['ac_code']) ?> · <?= count($calls) ?> support calls</p>
     </div>
     <div class="actions">
+        <?php if (is_admin()): ?><a class="btn" href="customer_edit.php?code=<?= h($code) ?>"><?= icon('edit') ?>Edit customer</a><?php endif; ?>
+        <form method="post" action="customer_edit.php?code=<?= h(urlencode($code)) ?>">
+            <?= csrf_field() ?><input type="hidden" name="action" value="delete">
+            <button class="btn btn-danger-outline" data-confirm="<?= h($c['name']) ?> (<?= h($code) ?>) will be removed from the ERP customer list. This cannot be undone. Only possible while no support call, job card or task uses this customer."
+                    data-confirm-title="Delete this customer?" data-confirm-ok="Delete customer" data-confirm-danger><?= icon('delete') ?>Delete</button>
+        </form>
         <?php if ($c['status'] === 'Active'): ?>
             <a class="btn btn-primary" href="call_add.php?customer=<?= h($code) ?>"><?= icon('add_call') ?>Add Support Call</a>
         <?php endif; ?>

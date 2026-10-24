@@ -15,11 +15,16 @@ GRANT SELECT ON dbo.ac_master      (company_code, ac_code, account_code, parent_
                                     description, contact_name, contact_no, tel_off, email, address, city,
                                     blocked, blocked_remark, blocked_by, blocked_date, category_code) TO support_app;
 GRANT SELECT ON dbo.category_master (category_code, category_name) TO support_app;
+-- Customer master (customer_edit.php): customers are added, edited and deleted in ac_master, like TaskManager.
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.ac_master TO support_app;
+GRANT SELECT ON dbo.service_location (service_location_code, service_location_name, sort_order) TO support_app;
+GRANT SELECT ON dbo.job_card_h       (company_code, ac_code) TO support_app;
+GRANT SELECT ON dbo.task_master      (company_code, ac_code) TO support_app;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.support_calls      TO support_app;
 GRANT SELECT                         ON dbo.v_support_calls    TO support_app;
-GRANT SELECT, INSERT, UPDATE         ON dbo.customer_flags     TO support_app;
-GRANT SELECT, INSERT, UPDATE         ON dbo.no_support_history TO support_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.customer_flags     TO support_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.no_support_history TO support_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON dbo.customer_notes     TO support_app;
 GRANT SELECT, INSERT                 ON dbo.support_calls_deleted TO support_app;
 GRANT SELECT                         ON dbo.admin_emp_map      TO support_app;
